@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="../static/css/style.css"> <!-- Подключаем CSS -->
+</head>
+
+<body>
+    <div class="container">
+        {{ if not .LoggedIn }}
+        <h1>Login</h1>
+        <form action="/login" method="post" class="auth-form">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        {{ else }}
+
+        <div class="user-info">
+            <h1>Welcome, {{ .Username }}</h1>
+            <a href="/logout" class="logout-link">Logout</a>
+        </div>
+
+        {{ if eq .Role "senior" }}
+        <form action="/add" method="post" class="add-form">
+            <div class="form-group">
+                <input type="text" name="todo" placeholder="Add a new ToDo..." required>
+            </div>
+            <button type="submit" class="btn btn-add">Add ToDo</button>
+        </form>
+        {{ else }}
+        <p class="info">Employees can't add todos.</p>
+        {{ end }}
+
+        <!-- ToDo list -->
+        <ul class="todo-list">
+            {{ range $index, $todo := .Todos }}
+            <li class="todo-item {{ if $todo.Done }}completed{{ end }}">
+                <form action="/toggle" method="post" style="display:inline;">
+                    <input type="hidden" name="index" value="{{ $index }}">
+                    <input type="checkbox" {{ if $todo.Done }}checked{{ end }} onchange="this.form.submit()">
+                </form>
+                {{ if $todo.Done }}
+                <del>{{ $todo.Text }}</del>
+                {{ else }}
+                {{ $todo.Text }}
+                {{ end }}
+            </li>
+            {{ end }}
+        </ul>
+        {{ end }}
+    </div>
+</body>
+
+</html>
